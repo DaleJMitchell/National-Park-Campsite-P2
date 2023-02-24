@@ -43,40 +43,62 @@ namespace CampgroundReservations.DAO
         } 
 
 
-        public IList<Site> GetCurrentAvailableSites(int parkId)
+        public IList<int> GetCurrentAvailableSites(int parkId)
         {
-            IList<Site> list = new List<Site>();
+            IList<int> list = new List<int>();
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
+                    List<int> siteIdList = new List<int>();
                     conn.Open();
                     SqlCommand cmd = new SqlCommand("" +
-                        "SELECT * FROM site " +
+                        "SELECT DISTINCT site.site_id FROM site " +
                         "JOIN campground ON campground.campground_id = site.campground_id " +
                         "JOIN reservation ON reservation.site_id = site.site_id " +
-                        "WHERE park_id = @park_id AND " +
-                            "from_date > GETDATE() OR " +
-                            "to_date < GETDATE() ;", conn);
-
-
-
-
-//                    SELECT site.site_id, site.site_number, site.max_occupancy, site.accessible, site.utilities FROM site
-//JOIN campground ON campground.campground_id = site.campground_id
-//JOIN reservation ON reservation.site_id = site.site_id
-//WHERE park_id = 1 AND
-//from_date > GETDATE() OR
-//to_date < GETDATE()
-//GROUP BY site.site_id 
-
+                        "WHERE park_id = @park_id " +
+                             "AND site.site_id NOT IN " +
+                             "  (SELECT site_id from reservation WHERE (GETDATE() BETWEEN from_date AND to_date))"
+                            , conn);
                     cmd.Parameters.AddWithValue("@park_id", parkId);
                     SqlDataReader reader = cmd.ExecuteReader();
+
                     while (reader.Read())
                     {
-                        Site site = GetSiteFromReader(reader);
-                        list.Add(site);
+                        int siteId = Convert.ToInt32(reader["site_id"]);
+                        //CHANGE NAME
+                        list.Add(siteId);
                     }
+                    foreach (int value in siteIdList)
+                    {
+                        Console.WriteLine(value);
+                    }
+
+                    //foreach (int siteid in siteIdList)
+                    //{
+
+                    //    try
+                    //    {
+                    //        using (SqlConnection conne = new SqlConnection(connectionString))
+                    //        {
+                    //            conne.Open();
+                    //            SqlCommand cmd2 = new SqlCommand("SELECT * FROM site WHERE site_id = @site_id;", conne);
+                    //            cmd2.Parameters.AddWithValue("@site_id", siteid);
+                    //            SqlDataReader reader2 = cmd2.ExecuteReader();
+                    //            while (reader2.Read())
+                    //            {
+                    //                Site site = GetSiteFromReader(reader2);
+                    //                list.Add(site);
+                    //            }
+                    //        }
+                    //    }
+                    //    catch
+                    //    {
+                    //        return list;
+                    //    }
+                    //
+                    //
+                    //}
                 }
 
             }

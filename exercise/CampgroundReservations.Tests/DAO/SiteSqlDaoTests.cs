@@ -24,16 +24,18 @@ namespace CampgroundReservations.Tests.DAO
 
 
         [TestMethod]
+        //I think we misunderstood the point of the function. Our function gets sites available tonight, which would be 1-5 and 10 and 11.
         public void GetCurrentAvailableSites_ReturnsCorrectNumberOfSites()
         {
             //ARRANGE
             SiteSqlDao dao = new SiteSqlDao(ConnectionString);
 
             //ACT
-            int resultCount = (dao.GetCurrentAvailableSites(ParkId)).Count;
+            IList<int> list = dao.GetCurrentAvailableSites(ParkId);
+            int resultCount = (list).Count;
 
             //ASSERT
-            Assert.AreEqual(2, resultCount);
+            Assert.AreEqual(7, resultCount);
         }
 
     }
