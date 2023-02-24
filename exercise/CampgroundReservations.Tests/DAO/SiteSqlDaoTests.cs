@@ -22,5 +22,19 @@ namespace CampgroundReservations.Tests.DAO
             Assert.AreEqual(2, sites.Count);
         }
 
+
+        [TestMethod]
+        public void GetCurrentAvailableSites_ReturnsCorrectNumberOfSites()
+        {
+            //ARRANGE
+            SiteSqlDao dao = new SiteSqlDao(ConnectionString);
+
+            //ACT
+            int resultCount = (dao.GetCurrentAvailableSites(ParkId)).Count;
+
+            //ASSERT
+            Assert.AreEqual(2, resultCount);
+        }
+
     }
 }

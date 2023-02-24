@@ -22,5 +22,19 @@ namespace CampgroundReservations.Tests.DAO
             Assert.AreEqual(ReservationId + 1, returnedId);
         }
 
+
+        [TestMethod]
+        public void UpcomingReservation_ReturnsCorrectNumberOfReservations()
+        {
+            //ARRANGE
+            ReservationSqlDao dao = new ReservationSqlDao(ConnectionString);
+
+            //ACT
+            int resultCount = (dao.UpcomingReservation(ParkId)).Count;
+
+            //ASSERT
+            Assert.AreEqual(2, resultCount);
+        }
+
     }
 }
